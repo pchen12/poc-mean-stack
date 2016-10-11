@@ -1,22 +1,30 @@
-angular.module("contactsApp", ['ngRoute'])
+angular.module("portalApp", ['ngRoute'])
     .config(function($routeProvider) {
         $routeProvider
             .when("/", {
-                templateUrl: "list.html",
+                controller: "HomeController",
+                templateUrl: "home.html"
+            })
+            .when("/events", {
+                controller: "EventController",
+                templateUrl: "events/display.html",
+            })
+            .when("/contacts", {
                 controller: "ListController",
+                templateUrl: "contacts/list.html",
                 resolve: {
                     contacts: function(Contacts) {
                         return Contacts.getContacts();
                     }
                 }
             })
-            .when("/new/contact", {
+            .when("/contacts/new/contact", {
                 controller: "NewContactController",
-                templateUrl: "contact-form.html"
+                templateUrl: "contacts/contact-form.html"
             })
-            .when("/contact/:contactId", {
+            .when("/contacts/contact/:contactId", {
                 controller: "EditContactController",
-                templateUrl: "contact.html"
+                templateUrl: "contacts/contact.html"
             })
             .otherwise({
                 redirectTo: "/"
@@ -70,17 +78,23 @@ angular.module("contactsApp", ['ngRoute'])
                 });
         }
     })
+    .controller("HomeController", function($scope) {
+        $scope.greeting = "Hello";
+    })
+    .controller("EventsController", function($scope) {
+
+    })
     .controller("ListController", function(contacts, $scope) {
         $scope.contacts = contacts.data;
     })
     .controller("NewContactController", function($scope, $location, Contacts) {
         $scope.back = function() {
-            $location.path("#/");
+            $location.path("#/contacts");
         }
 
         $scope.saveContact = function(contact) {
             Contacts.createContact(contact).then(function(doc) {
-                var contactUrl = "/contact/" + doc.data._id;
+                var contactUrl = "/contacts/contact/" + doc.data._id;
                 $location.path(contactUrl);
             }, function(response) {
                 alert(response);
@@ -96,7 +110,7 @@ angular.module("contactsApp", ['ngRoute'])
 
         $scope.toggleEdit = function() {
             $scope.editMode = true;
-            $scope.contactFormUrl = "contact-form.html";
+            $scope.contactFormUrl = "contacts/contact-form.html";
         }
 
         $scope.back = function() {
